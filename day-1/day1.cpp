@@ -7,14 +7,13 @@
 
 using namespace std;
 
-int main() {
+void run(const string filename){
     // read file
-    const string filename = "./input.txt";
     ifstream myfile(filename);
 
     if (!myfile.is_open()) {
         cerr << "Error: Unable to open file '" << filename << "'" << endl;
-        return 1;
+        throw "Unable to opepn file!";
     }
 
     int total = 0;
@@ -48,5 +47,17 @@ int main() {
     } else std::cout << "Unable to open file" << endl;
 
     std::cout << "Total: " << total << endl;
+}
+
+int main() {
+    // read file
+    const string filename = "./input.txt";
+
+    try{
+        run(filename);
+    } catch (const char* msg) {
+        cerr << msg << endl;
+    }
+
     return 0;
 }
