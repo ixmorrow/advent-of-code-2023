@@ -43,8 +43,17 @@ class NumberOperator {
         construct_number_map();
     };
 
-    bool is_num_str(char c){
-
+    pair<bool, int> is_num_str(int &i, string &line){
+        if(_number_mappings.find(line[i]) != _number_mappings.end()){
+            for(int j=0; j<_number_mappings[line[i]].size(); j++){
+                NumberString num = _number_mappings[line[i]][j];
+                string potential_num = line.substr(i, num.len);
+                if(potential_num == num.str){
+                    return {true, num.value};
+                }
+            }
+        }
+        return {false, 0};
     }
 
     unordered_map<char, vector<NumberString>> _number_mappings;
@@ -52,20 +61,29 @@ class NumberOperator {
 
 };
 
-void checkLine(int &total, string &line){
+void checkLine(int &total, string &line, NumberOperator &number_operator){
     bool first_digit_found = false;
     int first_digit = 0;
     int second_digit = 0;
     int current = 0;
 
-    for (auto character : line) {
-        if(isdigit(character)) {
-            int digit = character - '0';
+    for (int i=0; i<line.size(); i++) {
+        if(isdigit(line[i])) {
+            int digit = line[i] - '0';
             if (!first_digit_found) {
                 total += digit * 10;
                 first_digit_found = true;
                 first_digit = digit;
             } else second_digit = digit;
+        } else {
+            pair<bool, int> num_str_result = number_operator.is_num_str(i, line);
+            if(num_str_result.first){
+                if (!first_digit_found) {
+                    total += num_str_result.second * 10;
+                    first_digit_found = true;
+                    first_digit = num_str_result.second;
+                } else second_digit = num_str_result.second;
+            }
         }
     }
     if (second_digit == 0) total += first_digit;
@@ -88,7 +106,7 @@ void run(const string filename){
     string line;
     if (myfile.is_open()) {
         while(getline(myfile, line)) {
-            checkLine(total, line);
+            checkLine(total, line, number_operator);
         }
         myfile.close();
     } else std::cout << "Unable to open file" << endl;
