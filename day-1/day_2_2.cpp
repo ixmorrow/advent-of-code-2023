@@ -114,10 +114,14 @@ void run(const string filename){
     std::cout << "Total: " << total << endl;
 }
 
-int main() {
-
-    // read file
-    const string filename = "./input.txt";
+int main(int argc, char *argv[]) {
+    string filename;
+    if (argc != 2) {
+        cout << "Filename not provided. Using default file input.txt..." << endl;
+        filename = "input.txt";
+    } else {
+        filename = argv[1];
+    }
 
     try{
         run(filename);
