@@ -4,8 +4,53 @@
 #include <string>
 #include <sstream>
 #include <ctype.h>
+#include <unordered_map>
+#include <vector>
 
 using namespace std;
+
+struct NumberString {
+    string str;
+    int len;
+    int value;
+
+    // Constructor to initialize NumberString
+    NumberString(const string& s, int l, int v) : str(s), len(l), value(v) {}
+};
+
+
+class NumberOperator {
+    private:
+        void construct_number_map(){
+            for(int i=0; i<10; i++){
+                string spelling = _number_spellings[i];
+                _number_mappings[spelling[0]].push_back(NumberString(spelling, spelling.size(), i));
+            }
+        }
+    public:
+    NumberOperator(){
+        _number_spellings[0] = "zero";
+        _number_spellings[1] = "one";
+        _number_spellings[2] = "two";
+        _number_spellings[3] = "three";
+        _number_spellings[4] = "four";
+        _number_spellings[5] = "five";
+        _number_spellings[6] = "six";
+        _number_spellings[7] = "seven";
+        _number_spellings[8] = "eight";
+        _number_spellings[9] = "nine";
+
+        construct_number_map();
+    };
+
+    bool is_num_str(char c){
+
+    }
+
+    unordered_map<char, vector<NumberString>> _number_mappings;
+    unordered_map<int, string> _number_spellings;
+
+};
 
 void checkLine(int &total, string &line){
     bool first_digit_found = false;
@@ -28,6 +73,8 @@ void checkLine(int &total, string &line){
 }
 
 void run(const string filename){
+    NumberOperator number_operator = NumberOperator();
+
     // read file
     ifstream myfile(filename);
 
@@ -50,6 +97,7 @@ void run(const string filename){
 }
 
 int main() {
+
     // read file
     const string filename = "./input.txt";
 
