@@ -22,7 +22,8 @@ std::vector<string> split(string str,   char* delimiter)
 
 int main() {
     // read file
-    const string filename = "./input.txt";
+    // const string filename = "./input.txt";
+    const string filename = "./test.txt";
     ifstream myfile(filename);
 
     if (!myfile.is_open()) {
