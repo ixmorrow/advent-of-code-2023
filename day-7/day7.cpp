@@ -10,7 +10,7 @@
 using namespace std;
 
 
-enum class Hand_Type {
+enum class HandType {
     FiveOfAKind, // 0
     FourOfAKind, // 1
     FullHouse, // 2
@@ -23,18 +23,18 @@ enum class Hand_Type {
 struct Hand {
     string hand;
     int multiplier;
-    Hand_Type hand_type;
+    HandType hand_type;
     int winnings;
 
     // Constructor
-    Hand(string h, int m, Hand_Type ht) : hand(h), multiplier(m), hand_type(ht), winnings(0) {}
+    Hand(string h, int m, HandType ht) : hand(h), multiplier(m), hand_type(ht), winnings(0) {}
 };
 class CamelCards {
     public:
         CamelCards() { }
 
         void play(const string filename) {
-            auto hands = buildHands(filename);
+            auto hands = _build_hands(filename);
 
             // sorted list of hands
             list<Hand> sorted_hands;
@@ -48,7 +48,7 @@ class CamelCards {
                 hand.winnings = hand.multiplier * rank;
                 total_winnings += hand.winnings;
 
-                // cout << "Rank: " << rank << ", Hand: " << hand.hand << ", Multiplier: " << hand.multiplier << ", Winnings: " << hand.winnings << ", Type: " << static_cast<int>(hand.hand_type) << endl;
+                // cout << "Rank: " << rank << ", Hand: " << hand.hand << ", Multiplier: " << hand.multiplier << ", Winnings: " << hand.winnings << ", Type: " << static_cast<int>(hand.HandType) << endl;
                 rank++;
             }
 
@@ -73,7 +73,7 @@ class CamelCards {
             {'2', 2}
         };
 
-        vector<Hand> buildHands(const string filename){
+        vector<Hand> _build_hands(const string filename){
             // read file
             ifstream myfile(filename);
 
@@ -101,7 +101,7 @@ class CamelCards {
             return hands;
         }
 
-        Hand_Type _calculate_hand(string cards){
+        HandType _calculate_hand(string cards){
             unordered_map<char, int> card_count;
             for(auto card : cards) {
                 if(card_count.find(card) != card_count.end()) {
@@ -116,22 +116,22 @@ class CamelCards {
             int onePair = 0;
 
             for(auto it = card_count.begin(); it != card_count.end(); it++){
-                if(it->second == 5) return Hand_Type::FiveOfAKind;
-                else if(it->second == 4) return Hand_Type::FourOfAKind;
+                if(it->second == 5) return HandType::FiveOfAKind;
+                else if(it->second == 4) return HandType::FourOfAKind;
                 else if (it->second == 3){
-                    if(onePair == 1) return Hand_Type::FullHouse;
+                    if(onePair == 1) return HandType::FullHouse;
                     else threeOfKind = 1;
                 }
                 else if (it->second == 2){
-                    if(threeOfKind == 1) return Hand_Type::FullHouse;
-                    else if(onePair == 1) return Hand_Type::TwoPair;
+                    if(threeOfKind == 1) return HandType::FullHouse;
+                    else if(onePair == 1) return HandType::TwoPair;
                     else onePair = 1;
                 }
             }
 
-            if(threeOfKind == 1) return Hand_Type::ThreeOfAKind;
-            else if (onePair == 1) return Hand_Type::OnePair;
-            else return Hand_Type::HighCard;
+            if(threeOfKind == 1) return HandType::ThreeOfAKind;
+            else if (onePair == 1) return HandType::OnePair;
+            else return HandType::HighCard;
         }
 
         void _sort_hands(const Hand& hand, std::list<Hand>& hands) {
