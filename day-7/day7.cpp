@@ -9,25 +9,64 @@
 
 using namespace std;
 
-
 enum class HandType {
-    FiveOfAKind, // 0
-    FourOfAKind, // 1
-    FullHouse, // 2
-    ThreeOfAKind, // 3
-    TwoPair, // 4
-    OnePair, // 5
-    HighCard // 6
+    FiveOfAKind = 0,
+    FourOfAKind = 1,
+    FullHouse = 2,
+    ThreeOfAKind = 3,
+    TwoPair = 4,
+    OnePair = 5,
+    HighCard = 6,
+    UNKNOWN = 7
 };
 
-struct Hand {
-    string hand;
-    int multiplier;
-    HandType hand_type;
-    int winnings;
+class Hand {
+    public:
+        // Constructor
+        Hand(string h, int m) : cards(h), multiplier(m), winnings(0) {
+            hand_type = _calculate_hand(h);
+        }
 
-    // Constructor
-    Hand(string h, int m, HandType ht) : hand(h), multiplier(m), hand_type(ht), winnings(0) {}
+        string cards;
+        int multiplier;
+        HandType hand_type;
+        int winnings;
+        int _joker_count;
+
+    private:
+        HandType _calculate_hand(string cards){
+            unordered_map<char, int> card_count;
+            for(auto card : cards) {
+                if(card_count.find(card) != card_count.end()) {
+                    card_count[card] += 1;
+                }
+                else card_count[card] = 1;
+            }
+
+            _joker_count = card_count['J'];
+            int fullHouse = 0;
+            int threeOfKind = 0;
+            int twoPair = 0;
+            int onePair = 0;
+
+            for(auto it = card_count.begin(); it != card_count.end(); it++){
+                if(it->second == 5) return HandType::FiveOfAKind;
+                else if(it->second == 4) return HandType::FourOfAKind;
+                else if (it->second == 3){
+                    if(onePair == 1) return HandType::FullHouse;
+                    else threeOfKind = 1;
+                }
+                else if (it->second == 2){
+                    if(threeOfKind == 1) return HandType::FullHouse;
+                    else if(onePair == 1) return HandType::TwoPair;
+                    else onePair = 1;
+                }
+            }
+
+            if(threeOfKind == 1) return HandType::ThreeOfAKind;
+            else if (onePair == 1) return HandType::OnePair;
+            else return HandType::HighCard;
+        }
 };
 class CamelCards {
     public:
@@ -47,8 +86,6 @@ class CamelCards {
             for (auto hand : sorted_hands) {
                 hand.winnings = hand.multiplier * rank;
                 total_winnings += hand.winnings;
-
-                // cout << "Rank: " << rank << ", Hand: " << hand.hand << ", Multiplier: " << hand.multiplier << ", Winnings: " << hand.winnings << ", Type: " << static_cast<int>(hand.HandType) << endl;
                 rank++;
             }
 
@@ -90,7 +127,7 @@ class CamelCards {
                 int multiplier;
 
                 if (iss >> hand >> multiplier) {
-                    Hand hand_struct = {hand, multiplier, _calculate_hand(hand)};
+                    Hand hand_struct = {hand, multiplier};
                     hands.push_back(hand_struct);
                 } else {
                     // Handle error if the extraction fails
@@ -99,39 +136,6 @@ class CamelCards {
             }
 
             return hands;
-        }
-
-        HandType _calculate_hand(string cards){
-            unordered_map<char, int> card_count;
-            for(auto card : cards) {
-                if(card_count.find(card) != card_count.end()) {
-                    card_count[card] += 1;
-                }
-                else card_count[card] = 1;
-            }
-
-            int fullHouse = 0;
-            int threeOfKind = 0;
-            int twoPair = 0;
-            int onePair = 0;
-
-            for(auto it = card_count.begin(); it != card_count.end(); it++){
-                if(it->second == 5) return HandType::FiveOfAKind;
-                else if(it->second == 4) return HandType::FourOfAKind;
-                else if (it->second == 3){
-                    if(onePair == 1) return HandType::FullHouse;
-                    else threeOfKind = 1;
-                }
-                else if (it->second == 2){
-                    if(threeOfKind == 1) return HandType::FullHouse;
-                    else if(onePair == 1) return HandType::TwoPair;
-                    else onePair = 1;
-                }
-            }
-
-            if(threeOfKind == 1) return HandType::ThreeOfAKind;
-            else if (onePair == 1) return HandType::OnePair;
-            else return HandType::HighCard;
         }
 
         void _sort_hands(const Hand& hand, std::list<Hand>& hands) {
@@ -147,29 +151,26 @@ class CamelCards {
                         // Iterate over each individual card
                         int i;
                         for (i = 0; i < 5; i++) {
-                            if (hand.hand[i] == it->hand[i]) {
+                            if (hand.cards[i] == it->cards[i]) {
                                 // If the cards are equal, move on to the next one
                                 continue;
                             } else {
-                                if (_compare_card(hand.hand[i], it->hand[i])) {
+                                if (_compare_card(hand.cards[i], it->cards[i])) {
                                     breakout = true;
                                 } else {
                                     break;
                                 }
                             }
                         }
-
                         // Break out of the loop if all cards are equal
                         if (i == 5) {
                             break;
                         }
                     }
-
                     if (!breakout) {
                         ++it;
                     }
                 }
-
                 hands.insert(it, hand);
             }
         }
