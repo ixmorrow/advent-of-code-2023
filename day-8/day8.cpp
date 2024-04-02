@@ -29,6 +29,23 @@ class Map {
             }
         }
 
+        int traverse_map(){
+            int steps = 0;
+            Node current_node = nodes["AAA"];
+            
+            while(current_node.current_node != "ZZZ"){
+                int index = steps%directions.size();
+                if(directions[index] == 'L'){
+                    current_node = nodes[current_node.left_node];
+                } else {
+                    current_node = nodes[current_node.right_node];
+                }
+                steps++;
+            }
+
+            return steps;
+        }
+
     private:
         void _build_map(const string filename){
             // read file
@@ -91,11 +108,8 @@ int main(int argc, char *argv[]) {
     }
 
     Map map = Map(filename);
-    for(int i=0; i<map.directions.size(); i++){
-        cout << map.directions[i] << endl;
-    }
-
-    map.print_nodes();
-
+    int steps = map.traverse_map();
+    cout << "Steps: " << steps << endl;
+    
     return 0;
 }
