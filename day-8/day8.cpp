@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 
@@ -110,6 +111,6 @@ int main(int argc, char *argv[]) {
     Map map = Map(filename);
     int steps = map.traverse_map();
     cout << "Steps: " << steps << endl;
-    
+
     return 0;
 }
